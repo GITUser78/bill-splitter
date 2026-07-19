@@ -1,0 +1,68 @@
+<div class="items-section">
+  {% if unclaimed_items_total > 0 %}
+    <div class="unclaimed-notice">
+      <p><strong>{{ unclaimed_count }} units unclaimed</strong> (${{ "%.2f" | format(unclaimed_items_total) }})</p>
+    </div>
+  {% endif %}
+
+  <div class="items-list">
+    {% for item in session.items %}
+      {% set my_claimed = item.claimed_by.get(participant_id, 0) %}
+      <div class="item">
+        <div class="item-info">
+          <span class="item-name">{{ item.name }}</span>
+          <span class="item-quantity">x{{ item.quantity }} @ ${{ "%.2f" | format(item.unit_price) }} each</span>
+          <span class="item-price">${{ "%.2f" | format(item.total_price) }}</span>
+        </div>
+
+        <div class="claim-controls">
+          <form method="post" action="/sessions/{{ session_id }}/items/{{ item.id }}/claim?action=remove" class="claim-form">
+            <button type="submit" class="btn-minus" {% if my_claimed == 0 %}disabled{% endif %}>−</button>
+          </form>
+          <span class="quantity-display">{{ my_claimed }}/{{ item.quantity }}</span>
+          <form method="post" action="/sessions/{{ session_id }}/items/{{ item.id }}/claim?action=add" class="claim-form">
+            <button type="submit" class="btn-plus" {% if my_claimed >= item.quantity %}disabled{% endif %}>+</button>
+          </form>
+        </div>
+
+        {% if item.claimed_by %}
+          <div class="claimers">
+            {% for claimer_id, qty in item.claimed_by.items() %}
+              <span class="claimer">{{ session.participants[claimer_id].name }}: {{ qty }}</span>
+            {% endfor %}
+          </div>
+        {% endif %}
+      </div>
+    {% endfor %}
+  </div>
+
+  {% if my_total %}
+    <div class="your-total">
+      <p><strong>You owe: ${{ "%.2f" | format(my_total.total_owed) }}</strong></p>
+      <details>
+        <summary>Breakdown</summary>
+        <ul>
+          <li>Items: ${{ "%.2f" | format(my_total.claimed_subtotal) }}</li>
+          <li>Tax: ${{ "%.2f" | format(my_total.tax_share) }}</li>
+          <li>Tip: ${{ "%.2f" | format(my_total.tip_share) }}</li>
+        </ul>
+      </details>
+    </div>
+  {% endif %}
+
+  <div class="all-totals">
+    <h3>All totals</h3>
+    <table>
+      <tr>
+        <th>Name</th>
+        <th>Owes</th>
+      </tr>
+      {% for total in totals %}
+        <tr>
+          <td>{{ total.name }}</td>
+          <td>${{ "%.2f" | format(total.total_owed) }}</td>
+        </tr>
+      {% endfor %}
+    </table>
+  </div>
+</div>

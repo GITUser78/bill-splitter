@@ -1,0 +1,17 @@
+{% extends "base.html" %}
+
+{% block content %}
+<div class="page">
+  <h1>Join Bill</h1>
+  <p>Enter your name to join this bill split</p>
+
+  <form method="post" action="/sessions/{{ session_id }}/join" class="form">
+    <div class="form-group">
+      <label for="participant_name">Your name</label>
+      <input type="text" id="participant_name" name="participant_name" required autofocus>
+    </div>
+
+    <button type="submit">Join</button>
+  </form>
+</div>
+{% endblock %}

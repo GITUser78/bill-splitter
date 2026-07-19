@@ -1,0 +1,33 @@
+{% extends "base.html" %}
+
+{% block content %}
+<div class="page">
+  <h1>Bill Split</h1>
+
+  <div class="bill-info">
+    {% if session.total %}
+      <p class="total">Total: ${{ "%.2f" | format(session.total) }}</p>
+    {% endif %}
+  </div>
+
+  <div class="share-section">
+    <h3>Share this bill</h3>
+    <div class="qr-code">
+      <img src="/sessions/{{ session_id }}/qr.png" alt="QR code to join">
+    </div>
+    <p><a href="/sessions/{{ session_id }}/join">Share link</a></p>
+  </div>
+
+  <div id="items-container">
+    <p>Loading...</p>
+  </div>
+
+  <script src="/static/app.js"></script>
+  <script>
+    window.sessionId = "{{ session_id }}";
+    window.participantId = "{{ participant_id }}";
+    fetchFragment();
+    setInterval(fetchFragment, 2000);
+  </script>
+</div>
+{% endblock %}

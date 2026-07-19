@@ -178,6 +178,7 @@ The app checks for updates every 2 seconds. That's normal. You can change this i
 - **[QUICKSTART.md](QUICKSTART.md)** — Detailed setup + troubleshooting
 - **[IMPLEMENTATION.md](IMPLEMENTATION.md)** — Architecture, design choices, code structure
 - **[PROJECT_COMPLETE.md](PROJECT_COMPLETE.md)** — Complete project overview
+- **[TERMUX_SETUP.md](TERMUX_SETUP.md)** — Host the app on an Android phone via a hotspot, no cloud needed
 
 ---
 

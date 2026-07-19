@@ -18,9 +18,9 @@ A web app where:
 
 ### Step 1: Get an API Key
 
-1. Go to [Anthropic Console](https://console.anthropic.com)
-2. Click "Get API Key"
-3. Copy the key (starts with `sk-...`)
+1. Go to [Google AI Studio](https://aistudio.google.com/apikey)
+2. Click "Create API Key"
+3. Copy the key
 
 ### Step 2: Install Dependencies
 
@@ -43,7 +43,7 @@ pip install -r requirements.txt
 
 ```bash
 # Option A: One-time export
-export ANTHROPIC_API_KEY=sk-your-key-here
+export GOOGLE_API_KEY=your-key-here
 
 # Option B: Permanent (create .env file)
 # cp .env.example .env
@@ -107,7 +107,7 @@ hostname -I
 
 ## What Happens Behind the Scenes
 
-1. **Bill photo** → Claude AI extracts items, prices, tax, tip
+1. **Bill photo** → Gemini AI extracts items, prices, tax, tip
 2. **Items are listed** → Everyone sees the same list
 3. **Claiming** → When someone claims an item, it's split evenly among claimers
 4. **Calculation** → Tax and tip split proportionally to each person's claimed items
@@ -187,7 +187,7 @@ The app checks for updates every 2 seconds. That's normal. You can change this i
 Hello/
 ├── app/
 │   ├── main.py            — FastAPI app
-│   ├── bill_parser.py     — Claude vision integration
+│   ├── bill_parser.py     — Gemini vision integration
 │   ├── calculations.py    — Split math
 │   ├── routes/            — API endpoints
 │   ├── templates/         — HTML pages
@@ -205,19 +205,19 @@ All the code is well-commented and ready to customize.
 
 1. **Try it now** → Run the commands above and open `http://localhost:8000`
 2. **Test the math** → Run `pytest tests/test_calculations.py -v`
-3. **Customize** → Edit colors in `app/static/styles.css`, swap Claude model in `app/config.py`
+3. **Customize** → Edit colors in `app/static/styles.css`, swap Gemini model in `app/config.py`
 4. **Deploy** → Read [IMPLEMENTATION.md](IMPLEMENTATION.md) for production notes
 
 ---
 
 ## Want to Customize?
 
-### Change the Claude Model
+### Change the Gemini Model
 
 Edit `app/config.py`:
 
 ```python
-MODEL = "claude-opus-4-8"  # Change to claude-sonnet-5, etc.
+MODEL = "gemini-3.5-flash"  # Change to another Gemini model, etc.
 ```
 
 ### Change Colors
@@ -260,6 +260,6 @@ Enjoy!
 
 ---
 
-**Built with:** FastAPI • Claude Vision • Jinja2 • Vanilla JavaScript  
+**Built with:** FastAPI • Gemini Vision • Jinja2 • Vanilla JavaScript  
 **License:** No restrictions (personal project)  
 **Status:** Production-ready ✅

@@ -14,7 +14,7 @@ A **production-ready bill-splitting web application** that lets restaurant diner
 
 1. **Bill Photo Upload**
    - Host uploads a bill photo from their phone
-   - Claude vision API extracts all items, prices, tax, tip
+   - Gemini vision API extracts all items, prices, tax, tip
    - Structured outputs guarantee valid JSON (no parsing errors)
 
 2. **Real-Time Collaboration**
@@ -38,7 +38,7 @@ A **production-ready bill-splitting web application** that lets restaurant diner
 
 - **Backend:** FastAPI + Uvicorn
 - **Frontend:** Jinja2 templates + vanilla JS/CSS
-- **Bill parsing:** Claude vision API (structured outputs)
+- **Bill parsing:** Gemini vision API (structured outputs)
 - **Storage:** In-memory with thread-safe locking
 - **Updates:** Polling (2-second intervals, no WebSockets)
 
@@ -60,7 +60,7 @@ Hello/
 │   ├── config.py            ← Constants
 │   ├── models.py            ← Pydantic models (Participant, Session, etc.)
 │   ├── store.py             ← In-memory session storage
-│   ├── bill_parser.py       ← Claude vision + structured outputs
+│   ├── bill_parser.py       ← Gemini vision + structured outputs
 │   ├── calculations.py      ← Split math (proportional tax/tip)
 │   │
 │   ├── routes/
@@ -90,8 +90,8 @@ Hello/
 ### 1. Prerequisites
 
 ```bash
-# Get API key from https://console.anthropic.com
-export ANTHROPIC_API_KEY=sk-...
+# Get API key from https://aistudio.google.com/apikey
+export GOOGLE_API_KEY=...
 
 # Install dependencies
 cd /home/sta/Dokumente/Coding/python/Hello
@@ -143,7 +143,7 @@ Verifies the worked example:
 | Decision | Why |
 |----------|-----|
 | **Polling, not WebSockets** | Simpler, no reconnect logic; 2-sec latency acceptable for social use |
-| **Claude vision + structured outputs** | Most accurate for money extraction; JSON schema guarantees valid output |
+| **Gemini vision + structured outputs** | Most accurate for money extraction; JSON schema guarantees valid output |
 | **Decimal for money** | Precise arithmetic; no float rounding errors like `0.1 + 0.2` |
 | **In-memory store** | Prototyping speed; threading.Lock for concurrency; LAN-only scope |
 | **Server-side Jinja2** | No API-only complexity; HTML from templates directly |
@@ -208,7 +208,7 @@ If scaling beyond personal use:
 1. **Database** — replace in-memory store (PostgreSQL, SQLite)
 2. **HTTPS** — use proper certificates
 3. **Multi-worker** — add database session locking
-4. **Rate limiting** — throttle bill uploads (Claude API costs)
+4. **Rate limiting** — throttle bill uploads (Gemini API costs)
 5. **Logging** — structured logs for debugging
 6. **Monitoring** — Sentry or similar for error tracking
 
@@ -253,7 +253,7 @@ If scaling beyond personal use:
 Edit `app/config.py` to change:
 
 ```python
-MODEL = "claude-opus-4-8"      # Swap Claude model here
+MODEL = "gemini-3.5-flash"      # Swap Gemini model here
 MAX_IMAGE_DIMENSION = 1568      # Max pixel size for images
 POLL_INTERVAL_MS = 2000         # Live update frequency (ms)
 ```
@@ -293,7 +293,7 @@ POLL_INTERVAL_MS = 2000         # Live update frequency (ms)
 The implemented code follows the plan exactly:
 
 ✅ FastAPI + Uvicorn + Jinja2  
-✅ Claude vision API with structured outputs  
+✅ Gemini vision API with structured outputs  
 ✅ In-memory store with threading.Lock  
 ✅ Proportional tax/tip split  
 ✅ Polling-based live updates  
@@ -347,7 +347,7 @@ You can run it now, share it with friends, and customize it to your needs.
 
 ---
 
-**Built with:** FastAPI, Claude Vision, Jinja2, vanilla JS  
+**Built with:** FastAPI, Gemini Vision, Jinja2, vanilla JS  
 **Deploy to:** LAN (local network) or cloud (with database)  
 **License:** No restrictions (personal project)  
 **Last updated:** 2026-07-18

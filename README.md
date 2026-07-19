@@ -4,7 +4,7 @@ A web app for splitting restaurant bills among multiple diners. One person photo
 
 ## Features
 
-- 📸 Upload a bill photo — Claude vision API extracts items, prices, tax, and tip
+- 📸 Upload a bill photo — Gemini vision API extracts items, prices, tax, and tip
 - 👥 Multiple participants join via shareable link or QR code
 - ✅ Claim items you consumed — whole-item claiming with even splits
 - 💰 Real-time totals — each person sees how much they owe
@@ -15,7 +15,7 @@ A web app for splitting restaurant bills among multiple diners. One person photo
 ### Prerequisites
 
 - Python 3.13+
-- `ANTHROPIC_API_KEY` environment variable or `.env` file
+- `GOOGLE_API_KEY` environment variable or `.env` file
 
 ### Installation
 
@@ -30,7 +30,7 @@ source .venv/bin/activate  # On Windows: .venv\Scripts\activate
 # Install dependencies
 pip install -r requirements.txt
 
-# Create .env file (optional, ANTHROPIC_API_KEY from environment also works)
+# Create .env file (optional, GOOGLE_API_KEY from environment also works)
 cp .env.example .env
 # Edit .env and add your API key
 ```
@@ -49,7 +49,7 @@ uvicorn app.main:app --host 0.0.0.0 --port 8000 --reload
 ## How It Works
 
 1. **Host** uploads a bill photo
-   - Claude vision API extracts items, prices, tax/tip using structured outputs
+   - Gemini vision API extracts items, prices, tax/tip using structured outputs
    - A session is created with all items available to claim
 
 2. **Guests** join via link or QR code
@@ -72,7 +72,7 @@ uvicorn app.main:app --host 0.0.0.0 --port 8000 --reload
 
 - **FastAPI** — web framework
 - **Jinja2** — server-side template rendering
-- **Claude vision API** (structured outputs) — bill parsing
+- **Gemini vision API** (structured outputs) — bill parsing
 - **In-memory store** with `threading.Lock` — session management
 - **Polling** (2-second intervals) — live updates (not WebSockets)
 
@@ -151,7 +151,7 @@ pytest tests/test_calculations.py -v
 Edit `app/config.py`:
 
 ```python
-MODEL = "claude-opus-4-8"  # Change Claude model
+MODEL = "gemini-3.5-flash"  # Change Gemini model
 MAX_IMAGE_DIMENSION = 1568  # Max image size for vision
 POLL_INTERVAL_MS = 2000     # Live update frequency
 ```

@@ -9,7 +9,7 @@ This document summarizes the working implementation of the bill-splitting restau
 ```
 Hello/
 ├── requirements.txt           # 8 dependencies: FastAPI, Uvicorn, Jinja2, etc.
-├── .env.example              # Template for ANTHROPIC_API_KEY
+├── .env.example              # Template for GOOGLE_API_KEY
 ├── .gitignore                # Standard Python gitignore
 ├── README.md                 # User-facing documentation
 ├── IMPLEMENTATION.md         # This file
@@ -19,7 +19,7 @@ Hello/
 │   ├── config.py            # Constants (MODEL, MAX_IMAGE_DIMENSION, etc.)
 │   ├── models.py            # Pydantic: Participant, BillItem, Session, etc.
 │   ├── store.py             # In-memory SESSIONS dict + threading.Lock
-│   ├── bill_parser.py       # Claude vision API + structured outputs
+│   ├── bill_parser.py       # Gemini vision API + structured outputs
 │   ├── calculations.py      # Per-participant cost calculation
 │   │
 │   ├── routes/
@@ -46,27 +46,23 @@ Hello/
 
 ### 1. **Bill Parsing** (`app/bill_parser.py`)
 
-Uses Claude's structured outputs (JSON schema) for guaranteed valid extraction:
+Uses Gemini vision with a prompt-enforced JSON format for extraction:
 
 ```python
-# Calls Claude vision API with schema validation
-response = client.messages.create(
-    model="claude-opus-4-8",
-    output_config={"format": {"type": "json_schema", "schema": BILL_SCHEMA}},
-    messages=[{
-        "role": "user",
-        "content": [
-            {"type": "image", "source": {...}},  # Base64 JPEG
-            {"type": "text", "text": "Extract items..."},
-        ],
-    }],
-)
+# Calls Gemini vision API with an image + JSON-format prompt
+genai.configure(api_key=api_key)
+model = genai.GenerativeModel("gemini-3.5-flash")
+response = model.generate_content([
+    prompt,  # Instructs Gemini to return ONLY a JSON object
+    {"mime_type": "image/jpeg", "data": image_b64},
+])
+data = json.loads(response.text.strip())
 ```
 
 **Features:**
 - Resizes images (max 1568px longest edge) to reduce token cost
-- Validates schema at API level (not client-side JSON parsing)
-- Handles errors gracefully (refusal, max_tokens, connection)
+- Parses and validates the JSON response client-side (strips markdown fences if present)
+- Handles errors gracefully (bad JSON, empty response, API errors)
 - Converts to `Decimal` for precise money arithmetic
 
 ### 2. **Cost Calculation** (`app/calculations.py`)
@@ -210,7 +206,7 @@ If you want to deploy this publicly:
 2. **HTTPS** — use mkcert locally or real cert for production
 3. **Multi-worker** — add database session locking if using multiple processes
 4. **Error handling** — add logging, sentry, structured errors
-5. **Rate limiting** — throttle bill uploads (Claude API costs)
+5. **Rate limiting** — throttle bill uploads (Gemini API costs)
 6. **Authentication** — add user accounts if needed
 7. **Persistence** — store receipts, history, user sessions
 
@@ -274,7 +270,7 @@ If you add a database, you can use `--workers N > 1`.
 2. **No accounts** — anyone with the link can join
 3. **No persistence** — sessions lost on restart
 4. **LAN only** — designed for local use, not public internet
-5. **Single model** — hardcoded to `claude-opus-4-8` (configurable in `config.py`)
+5. **Single model** — hardcoded to `gemini-3.5-flash` (configurable in `config.py`)
 6. **No async** — bill parsing blocks the request (acceptable for one-time call)
 
 ## File Manifest
@@ -285,7 +281,7 @@ If you add a database, you can use `--workers N > 1`.
 | `app/config.py` | 4 | Configuration constants |
 | `app/models.py` | 58 | Pydantic models |
 | `app/store.py` | 18 | In-memory session storage |
-| `app/bill_parser.py` | 118 | Claude vision + structured outputs |
+| `app/bill_parser.py` | 118 | Gemini vision + structured outputs |
 | `app/calculations.py` | 45 | Cost split logic |
 | `app/routes/pages.py` | 33 | Page routes (GET) |
 | `app/routes/api.py` | 133 | API routes (POST/GET) |
@@ -306,7 +302,7 @@ If you add a database, you can use `--workers N > 1`.
 
 1. **FastAPI** — modern, fast, built-in automatic API docs
 2. **Jinja2** — server-side templates (simpler than JS frameworks for this scale)
-3. **Claude vision API** — most accurate for money-sensitive OCR
+3. **Gemini vision API** — accurate for money-sensitive OCR
 4. **Structured outputs** — guaranteed JSON validation at API level
 5. **Polling** — simpler than WebSockets for this use case
 6. **Decimal** — precise money arithmetic (no float rounding errors)
@@ -318,7 +314,7 @@ If you add a database, you can use `--workers N > 1`.
 - **Streamlit** — not suitable for real-time multi-user interactions
 - **React/Vue** — overkill for this single-page scenario
 - **WebSockets** — same single-process constraint, added complexity
-- **Tesseract/Google Vision** — Claude more accurate for structured data
+- **Tesseract** — Gemini more accurate for structured data
 - **SQLite** — adds complexity for a prototype
 - **Kubernetes** — not needed for single-process, LAN-only app
 
@@ -329,7 +325,7 @@ This implementation is a fully working bill-splitting app ready for personal use
 To run:
 ```bash
 pip install -r requirements.txt
-export ANTHROPIC_API_KEY=sk-...
+export GOOGLE_API_KEY=...
 uvicorn app.main:app --host 0.0.0.0 --port 8000
 # Open http://localhost:8000
 ```

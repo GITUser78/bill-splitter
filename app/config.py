@@ -1,5 +1,5 @@
 import os
 
-MODEL = "claude-opus-4-8"
+MODEL = "gemini-3.5-flash"
 MAX_IMAGE_DIMENSION = 1568
 POLL_INTERVAL_MS = 2000

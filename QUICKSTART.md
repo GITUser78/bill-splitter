@@ -2,7 +2,7 @@
 
 ## 1. Get your API key
 
-Sign up at [Anthropic Console](https://console.anthropic.com) and get your `ANTHROPIC_API_KEY`.
+Sign up at [Google AI Studio](https://aistudio.google.com/apikey) and get your `GOOGLE_API_KEY`.
 
 ## 2. Install dependencies
 
@@ -18,7 +18,7 @@ pip install -r requirements.txt
 Either:
 
 ```bash
-export ANTHROPIC_API_KEY=sk-...
+export GOOGLE_API_KEY=...
 ```
 
 Or create `.env`:
@@ -110,7 +110,7 @@ hostname -I
 
 - Read [README.md](README.md) for full features and API details
 - Read [IMPLEMENTATION.md](IMPLEMENTATION.md) for architecture and code structure
-- Modify [app/config.py](app/config.py) to change the Claude model or polling interval
+- Modify [app/config.py](app/config.py) to change the Gemini model or polling interval
 - Customize [app/static/styles.css](app/static/styles.css) to change colors/fonts
 
 ## Project Layout
@@ -118,7 +118,7 @@ hostname -I
 ```
 app/main.py              — FastAPI app entry point
 app/models.py            — Data models (Participant, Session, etc.)
-app/bill_parser.py       — Claude vision API calls
+app/bill_parser.py       — Gemini vision API calls
 app/calculations.py      — Split math
 app/routes/              — API endpoints
 app/templates/           — HTML pages (Jinja2)

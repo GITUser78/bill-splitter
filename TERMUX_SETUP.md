@@ -47,19 +47,22 @@ pip and creates `.env` from `.env.example` if it's missing.
 
 ```bash
 pkg update
-pkg install python git libjpeg-turbo python-cryptography tur-repo
-pkg install python-pillow python-grpcio python-watchfiles
+pkg install python git libjpeg-turbo python-cryptography python-pillow
+pip install --extra-index-url https://termux-user-repository.github.io/pypi/ grpcio watchfiles
 pip install -r requirements.txt
 cp .env.example .env
 ```
 
 `libjpeg-turbo` lets Pillow's image resizing work without a slow
-from-source build. `python-cryptography`, `python-pillow`, `python-grpcio`,
-and `python-watchfiles` are Termux's precompiled builds of packages that
-`google-generativeai` and `uvicorn[standard]` pull in indirectly — pip's
-versions either fail to build or fail to import on Termux's Python (see
-Troubleshooting below), so install them via `pkg` *before* the `pip
-install` step so pip sees they're already satisfied and leaves them alone.
+from-source build. `python-cryptography` and `python-pillow` are Termux's
+precompiled `pkg` builds of packages that `google-generativeai` pulls in
+indirectly — pip's versions fail to build or fail to import on Termux's
+Python (see Troubleshooting below). `grpcio` and `watchfiles` (pulled in by
+`google-generativeai` and `uvicorn[standard]`) have no `pkg`/apt package at
+all; instead install them from the Termux User Repository's own pip index,
+which hosts prebuilt wheels for them. Either way, install these *before*
+the plain `pip install` step so pip sees they're already satisfied and
+leaves them alone.
 
 </details>
 
@@ -151,28 +154,29 @@ your hotspot (not their own mobile data), and that you're using the IP from
 **`watchfiles`/`maturin` build failure** (`Target triple not supported by
 rustup: aarch64-unknown-linux-android`) — `uvicorn[standard]` depends on
 `watchfiles`, which is written in Rust; PyPI has no prebuilt wheel for
-Android ARM64, so pip tries (and fails) to compile it from source. Fix:
+Android ARM64, so pip tries (and fails) to compile it from source. There's
+also no `pkg`/apt package for it (`pkg install python-watchfiles` will
+fail with "Unable to locate package") — the fix is to point pip at the
+Termux User Repository's own pip index, which hosts a prebuilt wheel:
 
 ```bash
 pip uninstall watchfiles -y
-pkg install tur-repo -y
-pkg install python-watchfiles -y
+pip install --extra-index-url https://termux-user-repository.github.io/pypi/ watchfiles
 ```
 
 **`grpcio` wheel build failure** (`failed-wheel-build-for-install`) —
 `google-generativeai` pulls in `grpcio`, which needs a C++ toolchain built
-against gRPC/OpenSSL that isn't set up by default in Termux. Fix the same
-way, via Termux's precompiled build:
+against gRPC/OpenSSL that isn't set up by default in Termux. Same fix,
+same index:
 
 ```bash
 pip uninstall grpcio -y
-pkg install tur-repo -y
-pkg install python-grpcio -y
+pip install --extra-index-url https://termux-user-repository.github.io/pypi/ grpcio
 ```
 
 If you hit either of these on a fresh install, `setup-termux.sh` already
-installs both `python-watchfiles` and `python-grpcio` via `tur-repo` before
-running `pip install`, so pip never tries to build them itself.
+installs both from that index before running `pip install -r
+requirements.txt`, so pip never tries to build them itself.
 
 **`ImportError: dlopen failed: cannot locate symbol "PyLong_Type"` mentioning
 `cryptography/hazmat/bindings/_rust.abi3.so`** — pip installed a version of

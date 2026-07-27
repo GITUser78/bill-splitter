@@ -20,31 +20,38 @@ A web app for splitting restaurant bills among multiple diners. One person photo
 ### Installation
 
 ```bash
-# Clone or navigate to the project directory
-cd /home/sta/Dokumente/Coding/python/Hello
+./setup.sh
+```
 
-# Create and activate virtual environment
+Creates the virtual environment, installs dependencies, and creates `.env`
+from `.env.example` if it doesn't exist yet. Edit `.env` afterward to add
+your `GOOGLE_API_KEY`.
+
+<details>
+<summary>Manual setup (if you'd rather not use the script)</summary>
+
+```bash
 python3 -m venv .venv
 source .venv/bin/activate  # On Windows: .venv\Scripts\activate
-
-# Install dependencies
 pip install -r requirements.txt
-
-# Create .env file (optional, GOOGLE_API_KEY from environment also works)
 cp .env.example .env
 # Edit .env and add your API key
 ```
+
+</details>
 
 ### Running
 
 **Important:** Must run as a single process (no workers). The app uses in-memory session storage with threading locks.
 
 ```bash
-# Start the server on 0.0.0.0:8000 (accessible from your LAN)
-uvicorn app.main:app --host 0.0.0.0 --port 8000 --reload
-
-# Then open http://<your-lan-ip>:8000 on a phone or browser
+./start.sh
 ```
+
+Starts the server on `0.0.0.0:8000` (accessible from your LAN). Open
+`http://<your-lan-ip>:8000` on a phone or browser. For live-reload during
+development, run `uvicorn app.main:app --host 0.0.0.0 --port 8000 --reload`
+directly instead.
 
 ## How It Works
 

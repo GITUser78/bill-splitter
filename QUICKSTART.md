@@ -7,34 +7,28 @@ Sign up at [Google AI Studio](https://aistudio.google.com/apikey) and get your `
 ## 2. Install dependencies
 
 ```bash
-cd /home/sta/Dokumente/Coding/python/Hello
-python3 -m venv .venv
-source .venv/bin/activate
-pip install -r requirements.txt
+./setup.sh
 ```
+
+This creates the virtual environment, installs everything in
+`requirements.txt`, and creates `.env` from `.env.example` if it's missing.
 
 ## 3. Set API key
 
-Either:
+Edit `.env` (created by `setup.sh`) and paste your key:
 
-```bash
-export GOOGLE_API_KEY=...
 ```
-
-Or create `.env`:
-
-```bash
-cp .env.example .env
-# Edit .env and add your API key
+GOOGLE_API_KEY=your_google_gemini_api_key_here
 ```
 
 ## 4. Run the server
 
 ```bash
-uvicorn app.main:app --host 0.0.0.0 --port 8000
+./start.sh
 ```
 
-The `--host 0.0.0.0` makes it accessible from your phone on the same Wi-Fi.
+This runs on `0.0.0.0:8000`, which makes it accessible from your phone on
+the same Wi-Fi.
 
 ## 5. Open in browser
 

@@ -23,58 +23,58 @@ is outdated and its package repos no longer work.
 
 - F-Droid: https://f-droid.org/packages/com.termux/
 
-### 2. Install system packages
-
-Open Termux and run:
+### 2. Clone the repo
 
 ```bash
-pkg update
-pkg install python git libjpeg-turbo python-cryptography
-```
-
-`libjpeg-turbo` lets Pillow's image resizing work without a slow from-source
-build. `python-cryptography` is Termux's precompiled build of a package that
-`google-generativeai` pulls in indirectly — pip's version of it doesn't work
-on Termux's Python (see Troubleshooting below), so install it via `pkg`
-*before* the `pip install` step so pip sees it's already satisfied and
-leaves it alone.
-
-### 3. Clone the repo
-
-```bash
+pkg install git -y
 git clone https://github.com/GITUser78/bill-splitter.git
 cd bill-splitter
 ```
 
-### 4. Install Python dependencies
+### 3. Run the setup script
 
 ```bash
+./setup-termux.sh
+```
+
+This installs the system packages the app needs, including Termux's own
+precompiled builds of a few dependencies that don't build from source on
+Android (see Troubleshooting below for why), then installs the rest via
+pip and creates `.env` from `.env.example` if it's missing.
+
+<details>
+<summary>Manual setup (if you'd rather not use the script)</summary>
+
+```bash
+pkg update
+pkg install python git libjpeg-turbo python-cryptography tur-repo
+pkg install python-pillow python-grpcio python-watchfiles
 pip install -r requirements.txt
-```
-
-If `Pillow` fails to build, install Termux's precompiled version instead and
-remove it from `requirements.txt` for this device:
-
-```bash
-pkg install python-pillow
-```
-
-### 5. Set your Gemini API key
-
-```bash
 cp .env.example .env
 ```
 
-Edit `.env` and paste your key:
+`libjpeg-turbo` lets Pillow's image resizing work without a slow
+from-source build. `python-cryptography`, `python-pillow`, `python-grpcio`,
+and `python-watchfiles` are Termux's precompiled builds of packages that
+`google-generativeai` and `uvicorn[standard]` pull in indirectly — pip's
+versions either fail to build or fail to import on Termux's Python (see
+Troubleshooting below), so install them via `pkg` *before* the `pip
+install` step so pip sees they're already satisfied and leaves them alone.
+
+</details>
+
+### 4. Set your Gemini API key
+
+Edit `.env` (created by `setup-termux.sh`) and paste your key:
 
 ```
 GOOGLE_API_KEY=your_google_gemini_api_key_here
 ```
 
-### 6. Test it once
+### 5. Test it once
 
 ```bash
-uvicorn app.main:app --host 0.0.0.0 --port 8000
+./start-termux.sh
 ```
 
 Open `http://localhost:8000` in the phone's browser to confirm it loads,
@@ -95,7 +95,7 @@ In Termux:
 
 ```bash
 cd bill-splitter
-uvicorn app.main:app --host 0.0.0.0 --port 8000
+./start-termux.sh
 ```
 
 ### 3. Find your phone's hotspot IP
@@ -146,7 +146,33 @@ your hotspot (not their own mobile data), and that you're using the IP from
 `ip -4 addr show wlan0`, not `localhost`.
 
 **Pillow install fails** — Use `pkg install python-pillow` instead of pip
-(see step 4 above).
+(see step 3 above).
+
+**`watchfiles`/`maturin` build failure** (`Target triple not supported by
+rustup: aarch64-unknown-linux-android`) — `uvicorn[standard]` depends on
+`watchfiles`, which is written in Rust; PyPI has no prebuilt wheel for
+Android ARM64, so pip tries (and fails) to compile it from source. Fix:
+
+```bash
+pip uninstall watchfiles -y
+pkg install tur-repo -y
+pkg install python-watchfiles -y
+```
+
+**`grpcio` wheel build failure** (`failed-wheel-build-for-install`) —
+`google-generativeai` pulls in `grpcio`, which needs a C++ toolchain built
+against gRPC/OpenSSL that isn't set up by default in Termux. Fix the same
+way, via Termux's precompiled build:
+
+```bash
+pip uninstall grpcio -y
+pkg install tur-repo -y
+pkg install python-grpcio -y
+```
+
+If you hit either of these on a fresh install, `setup-termux.sh` already
+installs both `python-watchfiles` and `python-grpcio` via `tur-repo` before
+running `pip install`, so pip never tries to build them itself.
 
 **`ImportError: dlopen failed: cannot locate symbol "PyLong_Type"` mentioning
 `cryptography/hazmat/bindings/_rust.abi3.so`** — pip installed a version of
@@ -159,10 +185,9 @@ pip uninstall cryptography -y
 pkg install python-cryptography
 ```
 
-Then re-run `uvicorn app.main:app --host 0.0.0.0 --port 8000`. If you hit
-this on a fresh install, add `python-cryptography` to your `pkg install`
-command in step 2 *before* running `pip install -r requirements.txt`, so pip
-never installs its own broken copy.
+Then re-run `./start-termux.sh`. If you hit this on a fresh install,
+`setup-termux.sh` already installs `python-cryptography` before running
+`pip install`, so pip never installs its own broken copy.
 
 **Server stops when you switch apps** — Acquire the wakelock from the
 Termux notification, or keep Termux in the foreground for the duration.

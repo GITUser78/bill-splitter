@@ -1,9 +1,10 @@
 #!/usr/bin/env bash
 # One-time setup for running Bill Splitter inside Termux on Android.
-# Termux ships its own precompiled builds of packages that need Rust/C++
-# compilation (cryptography, grpcio, watchfiles) — pip's versions fail to
-# build or fail to import on Android ARM64, so we install those via pkg
-# first and let pip pick up the rest.
+# Some dependencies need Rust/C++ toolchains to build from source, which
+# don't work out of the box on Android:
+#   - cryptography, pillow: Termux ships precompiled apt (pkg) packages
+#   - grpcio, watchfiles: no apt package exists; TUR hosts prebuilt wheels
+#     via its own pip index instead
 set -e
 
 cd "$(dirname "$0")"
@@ -11,9 +12,9 @@ cd "$(dirname "$0")"
 pkg update -y
 pkg upgrade -y
 
-# tur-repo unlocks precompiled grpcio/watchfiles builds (see below)
-pkg install python git libjpeg-turbo python-cryptography tur-repo -y
-pkg install python-pillow python-grpcio python-watchfiles -y
+pkg install python git libjpeg-turbo python-cryptography python-pillow -y
+
+pip install --extra-index-url https://termux-user-repository.github.io/pypi/ grpcio watchfiles
 
 pip install -r requirements.txt
 

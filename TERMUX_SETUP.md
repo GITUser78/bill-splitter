@@ -29,11 +29,15 @@ Open Termux and run:
 
 ```bash
 pkg update
-pkg install python git libjpeg-turbo
+pkg install python git libjpeg-turbo python-cryptography
 ```
 
 `libjpeg-turbo` lets Pillow's image resizing work without a slow from-source
-build.
+build. `python-cryptography` is Termux's precompiled build of a package that
+`google-generativeai` pulls in indirectly — pip's version of it doesn't work
+on Termux's Python (see Troubleshooting below), so install it via `pkg`
+*before* the `pip install` step so pip sees it's already satisfied and
+leaves it alone.
 
 ### 3. Clone the repo
 
@@ -143,6 +147,22 @@ your hotspot (not their own mobile data), and that you're using the IP from
 
 **Pillow install fails** — Use `pkg install python-pillow` instead of pip
 (see step 4 above).
+
+**`ImportError: dlopen failed: cannot locate symbol "PyLong_Type"` mentioning
+`cryptography/hazmat/bindings/_rust.abi3.so`** — pip installed a version of
+`cryptography` (pulled in indirectly by `google-generativeai`) that's
+incompatible with Termux's Python build. Fix it by swapping in Termux's own
+precompiled package:
+
+```bash
+pip uninstall cryptography -y
+pkg install python-cryptography
+```
+
+Then re-run `uvicorn app.main:app --host 0.0.0.0 --port 8000`. If you hit
+this on a fresh install, add `python-cryptography` to your `pkg install`
+command in step 2 *before* running `pip install -r requirements.txt`, so pip
+never installs its own broken copy.
 
 **Server stops when you switch apps** — Acquire the wakelock from the
 Termux notification, or keep Termux in the foreground for the duration.

@@ -25,35 +25,38 @@ A web app where:
 ### Step 2: Install Dependencies
 
 ```bash
-# Open terminal, navigate to this folder
-cd /home/sta/Dokumente/Coding/python/Hello
+cd /home/sta/Dokumente/Coding/python/bill-splitter
+./setup.sh
+```
 
-# Create virtual environment
+This creates the virtual environment, installs everything in
+`requirements.txt`, and creates `.env` from `.env.example` if it's missing.
+
+<details>
+<summary>Manual setup (if you'd rather not use the script)</summary>
+
+```bash
 python3 -m venv .venv
-
-# Activate it
 source .venv/bin/activate
 # On Windows: .venv\Scripts\activate
-
-# Install everything needed
 pip install -r requirements.txt
+cp .env.example .env
 ```
+
+</details>
 
 ### Step 3: Set Your API Key
 
-```bash
-# Option A: One-time export
-export GOOGLE_API_KEY=your-key-here
+Edit `.env` (created by `setup.sh`) and paste your key:
 
-# Option B: Permanent (create .env file)
-# cp .env.example .env
-# Then edit .env and paste your key
+```
+GOOGLE_API_KEY=your_google_gemini_api_key_here
 ```
 
 ### Step 4: Run the App
 
 ```bash
-uvicorn app.main:app --host 0.0.0.0 --port 8000
+./start.sh
 ```
 
 You should see:
@@ -185,7 +188,7 @@ The app checks for updates every 2 seconds. That's normal. You can change this i
 ## Project Structure
 
 ```
-Hello/
+bill-splitter/
 ├── app/
 │   ├── main.py            — FastAPI app
 │   ├── bill_parser.py     — Gemini vision integration
@@ -253,7 +256,7 @@ POLL_INTERVAL_MS = 2000  # Change to 1000 for 1-second updates
 
 ## Happy Splitting! 🍕
 
-You're all set. Run `uvicorn app.main:app --host 0.0.0.0 --port 8000` and start sharing bills.
+You're all set. Run `./start.sh` and start sharing bills.
 
 No more "let me Venmo you $16.90" — your phone calculates it instantly.
 

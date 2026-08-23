@@ -7,7 +7,13 @@ import uuid
 from datetime import datetime
 import qrcode
 
-from ..store import create_session, get_session, update_session
+from ..store import (
+    create_session,
+    get_session,
+    update_session,
+    delete_session,
+    clear_all_sessions,
+)
 from ..models import Session, Participant, BillItem
 from ..bill_parser import parse_bill_image
 from ..calculations import compute_totals
@@ -93,6 +99,28 @@ def join_session(
     response = RedirectResponse(url=f"/sessions/{session_id}", status_code=303)
     response.set_cookie(f"pid_{session_id}", participant.id, httponly=True)
     return response
+
+
+@router.post("/sessions/{session_id}/delete")
+def delete_session_route(session_id: str, request: Request):
+    """End a session so the host can start a new one. Host-only."""
+    session = get_session(session_id)
+    if session:
+        participant_id = request.cookies.get(f"pid_{session_id}")
+        if participant_id != session.host_id:
+            return Response(status_code=403)
+        delete_session(session_id)
+
+    response = RedirectResponse(url="/", status_code=303)
+    response.delete_cookie(f"pid_{session_id}")
+    return response
+
+
+@router.post("/sessions/clear-all")
+def clear_all_sessions_route():
+    """Wipe every session on the server."""
+    clear_all_sessions()
+    return RedirectResponse(url="/", status_code=303)
 
 
 @router.post("/sessions/{session_id}/items/{item_id}/claim")

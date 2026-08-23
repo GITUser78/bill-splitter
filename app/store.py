@@ -18,3 +18,13 @@ def create_session(session: Session) -> None:
 def update_session(session: Session) -> None:
     with _lock:
         SESSIONS[session.id] = session
+
+
+def delete_session(session_id: str) -> None:
+    with _lock:
+        SESSIONS.pop(session_id, None)
+
+
+def clear_all_sessions() -> None:
+    with _lock:
+        SESSIONS.clear()

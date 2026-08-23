@@ -22,5 +22,12 @@
 
     <button type="submit">Create Session</button>
   </form>
+
+  <div class="danger-zone">
+    <form method="post" action="/sessions/clear-all"
+          onsubmit="return confirm('Delete ALL sessions on this server? This cannot be undone.');">
+      <button type="submit" class="btn-danger-subtle">Clear all sessions</button>
+    </form>
+  </div>
 </div>
 {% endblock %}

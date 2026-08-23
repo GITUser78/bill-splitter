@@ -39,9 +39,9 @@ def test_worked_example():
     coke = BillItem(name="Coke", unit_price=Decimal("3"), quantity=1)
 
     # A claims burger and coke; B claims fries
-    burger.claimed_by.add(a.id)
-    coke.claimed_by.add(a.id)
-    fries.claimed_by.add(b.id)
+    burger.claimed_by[a.id] = 1
+    coke.claimed_by[a.id] = 1
+    fries.claimed_by[b.id] = 1
 
     # Create session
     session = Session(

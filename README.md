@@ -10,6 +10,13 @@ A web app for splitting restaurant bills among multiple diners. One person photo
 - 💰 Real-time totals — each person sees how much they owe
 - 📱 Mobile-friendly — responsive web interface, works over LAN HTTP
 
+## Hosting Options
+
+- **[DEPLOY.md](DEPLOY.md)** — deploy it once to Render so guests can join
+  from their own mobile data, anywhere. No installs for guests.
+- **[TERMUX_SETUP.md](TERMUX_SETUP.md)** — run it entirely offline on an
+  Android phone over a Wi-Fi hotspot. No internet needed for guests.
+
 ## Setup
 
 ### Prerequisites

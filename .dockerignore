@@ -1,0 +1,10 @@
+.venv
+.git
+.env
+api_key.txt
+__pycache__
+*.pyc
+tests
+*.md
+.claude
+.vscode

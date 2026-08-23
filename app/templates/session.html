@@ -22,6 +22,15 @@
     <p>Loading...</p>
   </div>
 
+  {% if participant_id == session.host_id %}
+    <div class="danger-zone">
+      <form method="post" action="/sessions/{{ session_id }}/delete"
+            onsubmit="return confirm('End this session for everyone and start a new one? This cannot be undone.');">
+        <button type="submit" class="btn-danger">End Session &amp; Start New</button>
+      </form>
+    </div>
+  {% endif %}
+
   <script src="/static/app.js"></script>
   <script>
     window.sessionId = "{{ session_id }}";

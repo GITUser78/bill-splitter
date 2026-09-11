@@ -1,7 +1,5 @@
 from fastapi import APIRouter, Request, UploadFile, File, Form
 from fastapi.responses import RedirectResponse, Response, StreamingResponse
-from starlette.templating import Jinja2Templates
-import os
 import io
 import uuid
 from datetime import datetime
@@ -17,9 +15,7 @@ from ..store import (
 from ..models import Session, Participant, BillItem
 from ..bill_parser import parse_bill_image
 from ..calculations import compute_totals
-
-templates_dir = os.path.join(os.path.dirname(__file__), "../templates")
-templates = Jinja2Templates(directory=templates_dir)
+from ..templating import templates
 
 router = APIRouter()
 

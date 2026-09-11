@@ -1,7 +1,7 @@
 <div class="items-section">
   {% if unclaimed_items_total > 0 %}
     <div class="unclaimed-notice">
-      <p><strong>{{ unclaimed_count }} units unclaimed</strong> (€{{ "%.2f" | format(unclaimed_items_total) }})</p>
+      <p><strong>{{ unclaimed_count }} units unclaimed</strong> ({{ unclaimed_items_total | currency }})</p>
     </div>
   {% endif %}
 
@@ -11,8 +11,8 @@
       <div class="item">
         <div class="item-info">
           <span class="item-name">{{ item.name }}</span>
-          <span class="item-quantity">x{{ item.quantity }} @ €{{ "%.2f" | format(item.unit_price) }} each</span>
-          <span class="item-price">€{{ "%.2f" | format(item.total_price) }}</span>
+          <span class="item-quantity">x{{ item.quantity }} @ {{ item.unit_price | currency }} each</span>
+          <span class="item-price">{{ item.total_price | currency }}</span>
         </div>
 
         <div class="claim-controls">
@@ -38,13 +38,13 @@
 
   {% if my_total %}
     <div class="your-total">
-      <p><strong>You owe: €{{ "%.2f" | format(my_total.total_owed) }}</strong></p>
+      <p><strong>You owe: {{ my_total.total_owed | currency }}</strong></p>
       <details>
         <summary>Breakdown</summary>
         <ul>
-          <li>Items: €{{ "%.2f" | format(my_total.claimed_subtotal) }}</li>
-          <li>Tax: €{{ "%.2f" | format(my_total.tax_share) }}</li>
-          <li>Tip: €{{ "%.2f" | format(my_total.tip_share) }}</li>
+          <li>Items: {{ my_total.claimed_subtotal | currency }}</li>
+          <li>Tax: {{ my_total.tax_share | currency }}</li>
+          <li>Tip: {{ my_total.tip_share | currency }}</li>
         </ul>
       </details>
     </div>
@@ -60,7 +60,7 @@
       {% for total in totals %}
         <tr>
           <td>{{ total.name }}</td>
-          <td>€{{ "%.2f" | format(total.total_owed) }}</td>
+          <td>{{ total.total_owed | currency }}</td>
         </tr>
       {% endfor %}
     </table>

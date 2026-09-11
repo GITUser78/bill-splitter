@@ -7,27 +7,28 @@ from app.calculations import compute_totals
 def test_worked_example():
     """Burger $10 + Fries $5 + Coke $3 with A and B sharing.
 
+    Item prices are already tax-inclusive, so tax is NOT added again on top
+    (only tip is split proportionally across claimed items).
+
     A claims Burger ($10) + Coke ($3) = $13 claimed
     B claims Fries ($5)
 
     Subtotal: $18
-    Tax: $1.80 (10%)
+    Tax: $1.80 (10%, already included in item prices — not added again)
     Tip: $3.60 (20%)
-    Total: $23.40
+    Total: $21.60
 
     A's share: 13/18 ratio
       Claimed: $13.00
-      Tax: $1.80 * 13/18 = $1.30
       Tip: $3.60 * 13/18 = $2.60
-      Total: $16.90
+      Total: $15.60
 
     B's share: 5/18 ratio
       Claimed: $5.00
-      Tax: $1.80 * 5/18 = $0.50
       Tip: $3.60 * 5/18 = $1.00
-      Total: $6.50
+      Total: $6.00
 
-    Sum: $16.90 + $6.50 = $23.40 ✓
+    Sum: $15.60 + $6.00 = $21.60 ✓
     """
     # Create participants
     a = Participant(name="A")
@@ -65,16 +66,14 @@ def test_worked_example():
 
     # Verify A's totals
     assert a_total.claimed_subtotal == Decimal("13")
-    assert a_total.tax_share == Decimal("1.30")
     assert a_total.tip_share == Decimal("2.60")
-    assert a_total.total_owed == Decimal("16.90")
+    assert a_total.total_owed == Decimal("15.60")
 
     # Verify B's totals
     assert b_total.claimed_subtotal == Decimal("5")
-    assert b_total.tax_share == Decimal("0.50")
     assert b_total.tip_share == Decimal("1.00")
-    assert b_total.total_owed == Decimal("6.50")
+    assert b_total.total_owed == Decimal("6.00")
 
-    # Verify sum matches total
+    # Verify sum matches subtotal + tip only (tax excluded, already in item prices)
     total_owed = a_total.total_owed + b_total.total_owed
-    assert total_owed == Decimal("23.40")
+    assert total_owed == Decimal("21.60")

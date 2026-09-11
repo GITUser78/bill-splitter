@@ -55,6 +55,5 @@ class ParticipantTotal(BaseModel):
     participant_id: str
     name: str
     claimed_subtotal: Decimal
-    tax_share: Decimal
     tip_share: Decimal
     total_owed: Decimal

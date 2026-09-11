@@ -15,29 +15,28 @@ def compute_totals(session: Session) -> list[ParticipantTotal]:
                 share = item.unit_price * Decimal(qty_claimed)
                 participant_claimed[pid] += share
 
-    # Calculate proportional tax and tip
+    # Calculate proportional tip
+    # Note: tax is NOT added on top here — item prices are already tax-inclusive,
+    # so adding session.tax again would double-count it.
     total_claimed = sum(participant_claimed.values())
 
     results = []
     for pid, participant in session.participants.items():
         claimed_subtotal = participant_claimed[pid]
 
-        # Proportional split of tax and tip based on claimed subtotal
+        # Proportional split of tip based on claimed subtotal
         if total_claimed > 0:
             ratio = claimed_subtotal / total_claimed
-            tax_share = (session.tax or Decimal(0)) * ratio
             tip_share = (session.tip or Decimal(0)) * ratio
         else:
-            tax_share = Decimal(0)
             tip_share = Decimal(0)
 
-        total_owed = claimed_subtotal + tax_share + tip_share
+        total_owed = claimed_subtotal + tip_share
 
         results.append(ParticipantTotal(
             participant_id=pid,
             name=participant.name,
             claimed_subtotal=claimed_subtotal,
-            tax_share=tax_share,
             tip_share=tip_share,
             total_owed=total_owed,
         ))

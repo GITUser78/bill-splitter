@@ -6,7 +6,7 @@
 
   <div class="bill-info">
     {% if session.total %}
-      <p class="total">Total: ${{ "%.2f" | format(session.total) }}</p>
+      <p class="total">Total: €{{ "%.2f" | format(session.total) }}</p>
     {% endif %}
   </div>
 

@@ -13,7 +13,17 @@ async function fetchFragment() {
 
     const html = await response.text();
     const container = document.getElementById("items-container");
+
+    // Preserve open/closed state of the breakdown <details> across re-renders,
+    // since replacing innerHTML would otherwise always reset it to closed.
+    const wasBreakdownOpen = container.querySelector("details")?.open ?? false;
+
     container.innerHTML = html;
+
+    const breakdownDetails = container.querySelector("details");
+    if (breakdownDetails) {
+      breakdownDetails.open = wasBreakdownOpen;
+    }
 
     // Re-attach event listeners after DOM update
     attachFormListeners();
